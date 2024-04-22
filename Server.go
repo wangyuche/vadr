@@ -1,65 +1,83 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
-var tgfile []byte
-var cmfile []byte
+var tgfile []rune
+var cmfile []rune
+var base []string = make([]string, 0)
 
 func main() {
-	files := os.Args[1:]
-	if len(files) != 2 {
+	readFile, err := os.Open("./base.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split(bufio.ScanLines)
+	for fileScanner.Scan() {
+		base = append(base, fileScanner.Text())
+	}
+	readFile.Close()
+
+	if len(os.Args) != 2 {
 		panic("檔案數量不對")
 	}
-	dat, err := os.ReadFile(files[0])
+	dat, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
-	tgfile = dat
-	dat, err = os.ReadFile(files[1])
-	if err != nil {
-		panic(err)
-	}
-	cmfile = dat
-	var cm, tg, lenght, tgoff int
-	cm = 0
-	tg = 0
-	tgoff = 0
-	for cm < len(cmfile) {
-		for tg < len(tgfile) {
-			if cmfile[cm] == tgfile[tg] {
-				lenght = 1
-				break
-			}
-			tg++
-		}
-		if lenght == 0 {
-			tg = tgoff
-			cm++
-		}
-		if lenght != 0 && cm+lenght < len(cmfile) && tg+lenght < len(tgfile) {
-			for cmfile[cm+lenght] == tgfile[tg+lenght] {
-				lenght++
-				if cm+lenght >= len(cmfile) || tg+lenght >= len(tgfile) {
+	str := strings.Replace(string(dat), "\n", "", -1)
+	tgfile = []rune(str)
+	fmt.Println(len([]rune(base[0])))
+	for i := 0; i < len(base); i++ {
+		temp := []rune(base[i])
+		startindex := 0
+		endindex := 0
+		//fmt.Println(i)
+		/*
+			for {
+				index := indexAt(string(tgfile), string(temp[:10]), startindex+10)
+				if index == -1 {
 					break
 				}
+				startindex = index
 			}
-			if lenght > 10 {
-				fmt.Printf("開始位置 %d\n結束位置 %d\n結果 %s\n", cm+1, cm+lenght, string(cmfile[cm:cm+lenght]))
-				cm = cm + lenght
-				tgoff = tg + lenght
-				tg = tg + lenght
-				lenght = 0
-			} else if lenght == 1 {
-				lenght = 0
-				cm++
-			} else {
-				cm = cm + lenght
-				lenght = 0
+			for {
+				index := indexAt(string(tgfile), string(temp[len(temp)-10:]), endindex+10)
+				if index == -1 {
+					break
+				}
+				endindex = index
+			}*/
+		//fmt.Printf(string(temp[len(temp)-10:]))
+		//endindex = strings.Index(string(tgfile), string(temp[len(temp)-10:]))
+		//fmt.Printf("開始位置 %d\n結束位置 %d\n結果 %s\n", startindex+1, endindex+10, "")
+		/*
+			for {
+				startindex = indexAt(string(tgfile), string(temp[:10]), startindex+10)
+				if startindex == -1 {
+					break
+				}
+				fmt.Printf("開始位置 %d\n結束位置 %d\n結果 %s\n", startindex+1, startindex+len([]byte(base[i])), "")
 			}
+		*/
 
+		startindex = strings.Index(string(tgfile), string(temp[:10]))
+		endindex = strings.Index(string(tgfile), string(temp[len(temp)-10:]))
+		if startindex != -1 {
+			fmt.Printf("開始位置 %d\n結束位置 %d\n結果 %s\n", startindex+1, endindex+10, "")
 		}
 	}
+}
+
+func indexAt(s, sep string, n int) int {
+	idx := strings.Index(s[n:], sep)
+	if idx > -1 {
+		idx += n
+	}
+	return idx
 }

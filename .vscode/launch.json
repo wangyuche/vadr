@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/Server.go",
             "env": {
             },
-            "args": ["a.txt", "b.txt"]
+            "args": ["sequence.fasta"]
         }
     ]
 }
