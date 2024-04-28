@@ -12,7 +12,11 @@ var cmfile []rune
 var base []string = make([]string, 0)
 
 func main() {
-	readFile, err := os.Open("./base.txt")
+	if len(os.Args) != 3 {
+		panic("檔案數量不對")
+	}
+
+	readFile, err := os.Open(os.Args[1])
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -23,16 +27,22 @@ func main() {
 	}
 	readFile.Close()
 
-	if len(os.Args) != 2 {
-		panic("檔案數量不對")
-	}
-	dat, err := os.ReadFile(os.Args[1])
+	str := ""
+	readFile2, err := os.Open(os.Args[2])
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	str := strings.Replace(string(dat), "\n", "", -1)
+	fileScanner2 := bufio.NewScanner(readFile2)
+	fileScanner2.Split(bufio.ScanLines)
+	for fileScanner2.Scan() {
+		if strings.Contains(fileScanner2.Text(), ">") {
+			continue
+		}
+		str = str + strings.Replace(fileScanner2.Text(), "\n", "", -1)
+	}
+	readFile2.Close()
 	tgfile = []rune(str)
-	fmt.Println(len([]rune(base[0])))
+
 	for i := 0; i < len(base); i++ {
 		temp := []rune(base[i])
 		startindex := 0
